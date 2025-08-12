@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface EmployeeRepository extends CrudRepository<Employee, String> {
-    Employee findByEmailAdress(String id);
+public interface EmployeeRepository extends CrudRepository<Employee, Long> {
+
+    boolean existsByEmailAdress(String emailAdress);
+
+    Optional<Employee> findByEmailAdress(String emailAdress);
     
     List<Employee> findAllByLastName(String lastName);
 
