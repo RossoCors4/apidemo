@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.tintin.demo.EmployeeRepository;
+import com.tintin.demo.InvalidRequestException;
 import com.tintin.demo.entity.Employee;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,17 +52,20 @@ public class EmployeeController {
     
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> postEmployee(@RequestBody Employee employee) {
+    public ResponseEntity<?> postEmployee(@RequestBody Employee employee) throws ResponseStatusException {
         if(employeeRepository.existsByEmailAdress(employee.getEmailAdress())){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use!");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee with that email already exists!");
         }
         Employee saved = employeeRepository.save(employee);
         return ResponseEntity.created(URI.create("/api/"+saved.getId())).body(saved);
     }
     @DeleteMapping(value ="/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable("id")long id, @RequestBody Employee employee){
+    public ResponseEntity<Void> delete(@PathVariable("id")long id)throws InvalidRequestException{
+        if(employeeRepository.findById(id).isEmpty()){
+            throw new InvalidRequestException("Employee does not exist.");
+        }
         employeeRepository.deleteById(id);
+        return ResponseEntity.noContent().build();//204
     }
     
 }

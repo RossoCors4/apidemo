@@ -9,18 +9,22 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tintin.demo.controller.EmployeeController;
 import com.tintin.demo.entity.Employee;
+import com.tintin.demo.InvalidRequestException;
 
 @WebMvcTest(EmployeeController.class)
 public class EmployeeControllerTest {
@@ -96,7 +100,29 @@ public class EmployeeControllerTest {
 
         mockMvc.perform(mockRequest)
         .andExpect(status().isConflict())
-        .andExpect(result -> assertTrue(result.getResolvedException() instanceof RuntimeException));
+        .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException));
+    }
+
+    @Test
+    void deleteEmployeeById_success()throws Exception{
+        Mockito.when(employeeRepository.findById(EMPLOYEE_1.getId())).thenReturn(Optional.of(EMPLOYEE_1));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/api/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());   
+    }
+    @Test
+    void deleteEmployeeById_notFound()throws Exception{
+        Mockito.when(employeeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete("/api/1"))
+            .andExpect(status().isBadRequest())
+            .andExpect(result -> {
+                assertTrue(result.getResolvedException() instanceof InvalidRequestException);
+                assertEquals("Employee does not exist.", result.getResolvedException().getMessage());
+            });
     }
 
 }
