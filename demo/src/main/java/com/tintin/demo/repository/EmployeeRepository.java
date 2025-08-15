@@ -1,4 +1,4 @@
-package com.tintin.demo;
+package com.tintin.demo.repository;
 
 import org.springframework.data.repository.CrudRepository;
 

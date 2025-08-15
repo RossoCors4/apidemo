@@ -24,7 +24,8 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tintin.demo.controller.EmployeeController;
 import com.tintin.demo.entity.Employee;
-import com.tintin.demo.InvalidRequestException;
+import com.tintin.demo.exception.InvalidRequestException;
+import com.tintin.demo.repository.EmployeeRepository;
 
 @WebMvcTest(EmployeeController.class)
 public class EmployeeControllerTest {
