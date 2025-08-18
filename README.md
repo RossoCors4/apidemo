@@ -6,7 +6,9 @@ No authentication is configured in this demo.
 You can run it locally with 
 ```bash
 ./mvnw spring-boot:run
-# or
+```
+or
+```bash
 mvn spring-boot:run
 ```
 
